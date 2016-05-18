@@ -209,6 +209,15 @@ const float NJKFinalProgressValue = 0.9f;
 
 #pragma mark - WKWebView Delegate Methods
 
+- (WKWebView *)webView:(WKWebView *)webView createWebViewWithConfiguration:(WKWebViewConfiguration *)configuration forNavigationAction:(WKNavigationAction *)navigationAction windowFeatures:(WKWindowFeatures *)windowFeatures
+{
+    if ([_webViewUIProxyDelegate respondsToSelector:@selector(webView:createWebViewWithConfiguration:forNavigationAction:windowFeatures:)]) {
+        [_webViewUIProxyDelegate webView:webView createWebViewWithConfiguration:configuration forNavigationAction:navigationAction windowFeatures:windowFeatures];
+    }
+    
+    return nil;
+}
+
 - (void)webView:(WKWebView *)webView decidePolicyForNavigationAction:(WKNavigationAction *)navigationAction decisionHandler:(void (^)(WKNavigationActionPolicy))decisionHandler
 {
     if ([navigationAction.request.URL.path isEqualToString:completeRPCURLPath]) {
@@ -221,7 +230,7 @@ const float NJKFinalProgressValue = 0.9f;
     void (^delegateDecisionHandler)(WKNavigationActionPolicy) = ^(WKNavigationActionPolicy decision){
         toContinue = decision;
         if (toContinue) {
-            decisionHandler([self shouldStartDecidePolicy:[navigationAction request] navigationType:navigationAction.navigationType onWebView:webView]);
+            decisionHandler(WKNavigationActionPolicyAllow); //[self shouldStartDecidePolicy:[navigationAction request] navigationType:navigationAction.navigationType onWebView:webView]);
         } else {
             NZLLogDebug(@"stopping webview loading on %@", navigationAction.request.URL.absoluteString);
         }

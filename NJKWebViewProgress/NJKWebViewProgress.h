@@ -25,6 +25,7 @@ typedef void (^NJKWebViewProgressBlock)(float progress);
 @property (nonatomic, njk_weak) id<NJKWebViewProgressDelegate>progressDelegate;
 @property (nonatomic, njk_weak) id<UIWebViewDelegate>webViewProxyDelegate;
 @property (nonatomic, njk_weak) id<WKNavigationDelegate>webViewNavigationProxyDelegate;
+@property (nonatomic, njk_weak) id<WKUIDelegate>webViewUIProxyDelegate;
 @property (nonatomic, copy) NJKWebViewProgressBlock progressBlock;
 @property (nonatomic, readonly) float progress; // 0.0..1.0
 
