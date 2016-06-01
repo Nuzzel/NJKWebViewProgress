@@ -226,19 +226,31 @@ const float NJKFinalProgressValue = 0.9f;
         return;
     }
     
-    __block BOOL toContinue = YES;
     void (^delegateDecisionHandler)(WKNavigationActionPolicy) = ^(WKNavigationActionPolicy decision){
-        toContinue = decision;
-        if (toContinue) {
-            decisionHandler(WKNavigationActionPolicyAllow); //[self shouldStartDecidePolicy:[navigationAction request] navigationType:navigationAction.navigationType onWebView:webView]);
-        } else {
-            NZLLogDebug(@"stopping webview loading on %@", navigationAction.request.URL.absoluteString);
-        }
+        decisionHandler(decision);
     };
     if ([_webViewNavigationProxyDelegate respondsToSelector:@selector(webView:decidePolicyForNavigationAction:decisionHandler:)]) {
         [_webViewNavigationProxyDelegate webView:webView decidePolicyForNavigationAction:navigationAction decisionHandler:delegateDecisionHandler];
     } else {
         delegateDecisionHandler(WKNavigationActionPolicyAllow);
+    }
+}
+
+- (void)webView:(WKWebView *)webView decidePolicyForNavigationResponse:(WKNavigationResponse *)navigationResponse decisionHandler:(void (^)(WKNavigationResponsePolicy))decisionHandler
+{
+    if ([navigationResponse.response.URL.path isEqualToString:completeRPCURLPath]) {
+        [self completeProgress];
+        decisionHandler(WKNavigationResponsePolicyCancel);
+        return;
+    }
+    
+    void (^delegateDecisionHandler)(WKNavigationResponsePolicy) = ^(WKNavigationResponsePolicy decision){
+        decisionHandler(decision);
+    };
+    if ([_webViewNavigationProxyDelegate respondsToSelector:@selector(webView:decidePolicyForNavigationResponse:decisionHandler:)]) {
+        [_webViewNavigationProxyDelegate webView:webView decidePolicyForNavigationResponse:navigationResponse decisionHandler:delegateDecisionHandler];
+    } else {
+        delegateDecisionHandler(WKNavigationResponsePolicyAllow);
     }
 }
 
